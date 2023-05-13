@@ -1,7 +1,6 @@
-import { Router } from "express";
-import studentRouter from "./student.route.js";
+const { Router } = require("express");
 
 const router = Router();
-router.use("/api/student", studentRouter);
+router.use("/auth", require("./auth.route"));
 
-export default router;
+module.exports = router;
