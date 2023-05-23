@@ -2,41 +2,40 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Accounts", {
+    await queryInterface.createTable("Posts", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
+      title: {
         type: Sequelize.STRING,
       },
-      phone: {
-        type: Sequelize.STRING(10),
-        unique: true,
+      parentId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Posts",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
-      sex: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
-      address: {
-        type: Sequelize.STRING,
-        defaultValue: "",
-      },
-      birthday: {
-        type: Sequelize.DATE,
-        defaultValue: new Date(),
-      },
-      gmail: {
-        type: Sequelize.STRING,
-        unique: true,
-      },
-      password: {
+      content: {
         type: Sequelize.STRING,
       },
-      role: {
-        type: Sequelize.STRING,
+      accountId: {
+        type: Sequelize.INTEGER,
+      },
+      topicId: {
+        type: Sequelize.INTEGER,
+      },
+      likes: {
+        type: Sequelize.INTEGER,
+      },
+      views: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
@@ -49,6 +48,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Accounts");
+    await queryInterface.dropTable("Posts");
   },
 };

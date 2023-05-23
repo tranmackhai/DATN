@@ -9,11 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Account.hasMany(models.News, { as: "newsList", foreignKey: "accountId" });
+      Account.hasMany(models.CommentNews, { as: "commentNewsList", foreignKey: "accountId" });
     }
   }
   Account.init(
     {
       name: DataTypes.STRING,
+      birthday: { defaultValue: new Date(), type: DataTypes.DATE },
+      sex: { defaultValue: true, type: DataTypes.BOOLEAN },
+      address: { defaultValue: "", type: DataTypes.STRING },
       phone: { unique: true, type: DataTypes.STRING(10) },
       gmail: { unique: true, type: DataTypes.STRING },
       password: DataTypes.STRING,

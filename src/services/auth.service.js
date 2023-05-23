@@ -5,7 +5,8 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   register: async (body) => {
     try {
-      const { name, password, phone, gmail } = body;
+      const { name, password, phone, gmail, role } = body;
+      const hash = await argon.hash(password);
       const saved = await db.Account.create({
         name,
         gmail,
@@ -100,9 +101,8 @@ module.exports = {
         { expiresIn: "5m" }
       );
       return { data: accessToken, status: 201 };
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
 
       return res.status(500).json({ message: "Error!!!" });
     }
