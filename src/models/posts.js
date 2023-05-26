@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
   Posts.init(
     {
       title: DataTypes.STRING,
-      content: DataTypes.STRING,
+      content: DataTypes.TEXT,
       accountId: DataTypes.INTEGER,
       topicId: DataTypes.INTEGER,
-      likes: DataTypes.INTEGER,
-      views: DataTypes.INTEGER,
+      likes: { type: DataTypes.INTEGER, defaultValue: 0 },
+      views: { type: DataTypes.INTEGER, defaultValue: 0 },
       parentId: {
         type: DataTypes.INTEGER,
         allowNull: true,

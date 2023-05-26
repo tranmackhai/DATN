@@ -23,7 +23,7 @@ module.exports = {
         onDelete: "CASCADE",
       },
       content: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       accountId: {
         type: Sequelize.INTEGER,
@@ -33,9 +33,11 @@ module.exports = {
       },
       likes: {
         type: Sequelize.INTEGER,
+        defaultValue: 0,
       },
       views: {
         type: Sequelize.INTEGER,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,

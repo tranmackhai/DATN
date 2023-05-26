@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model, BOOLEAN } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class News extends Model {
     /**
@@ -11,20 +9,30 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      News.belongsTo(models.Account, { as: "account", foreignKey: "accountId" });
-      News.hasMany(models.CommentNews, { as: "commentNewsList", foreignKey: "newsId" });
+      News.belongsTo(models.Account, {
+        as: "account",
+        foreignKey: "accountId",
+      });
+      News.hasMany(models.CommentNews, {
+        as: "commentNewsList",
+        foreignKey: "newsId",
+      });
     }
   }
-  News.init({
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    accountId: DataTypes.INTEGER,
-    slug: DataTypes.STRING,
-    thumbnail: DataTypes.STRING,
-    type: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'News',
-  });
+  News.init(
+    {
+      title: DataTypes.STRING,
+      content: DataTypes.TEXT,
+      accountId: DataTypes.INTEGER,
+      thumbnail: DataTypes.STRING,
+      slug: { type: DataTypes.STRING, unique: true },
+      isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
+      type: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "News",
+    }
+  );
   return News;
 };

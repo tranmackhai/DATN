@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   Topic.init(
     {
       title: DataTypes.STRING,
-      slug: DataTypes.STRING,
+      slug: { type: DataTypes.STRING, unique: true },
       description: DataTypes.STRING,
       parentId: {
         type: DataTypes.INTEGER,

@@ -23,7 +23,8 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       slug: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true,
       },
       description: {
         type: Sequelize.STRING
