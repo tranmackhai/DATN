@@ -6,7 +6,6 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const path = `./`;
     mkdirSync(path, { recursive: true });
-    console.log("Dốt");
     cb(null, path);
   },
   filename: function (req, file, cb) {

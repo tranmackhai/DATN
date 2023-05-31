@@ -31,7 +31,22 @@ class AuthController {
 
   async refreshToken(req, res) {
     const { status, data } = await authService.refreshToken(req);
-    
+
+    return res.status(status).json(data);
+  }
+
+  async getProfile(req, res) {
+    const { data, status } = await authService.getProfile(req.user.id);
+    return res.status(status).json(data);
+  }
+
+  async changePassword(req, res) {
+    const { data, status } = await authService.changePassword(req.user.id, req.body);
+    return res.status(status).json(data);
+  }
+
+  async changeProfile(req, res) {
+    const { data, status } = await authService.changeProfile(req.user.id, req.body);
     return res.status(status).json(data);
   }
 }

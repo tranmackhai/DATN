@@ -2,11 +2,12 @@ const db = require("../models");
 
 module.exports = {
   create: async (body) => {
+    console.log(body)
     try {
       const data = await db.News.create({
         ...body,
-        type: "recruitment",
-        accountId: 4,
+        // type: "recruitment",
+        // accountId: 4,
       });
       return { data: data, status: 201 };
     } catch (error) {
@@ -21,6 +22,7 @@ module.exports = {
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
       const { rows, count } = await db.News.findAndCountAll({
+        
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
         where: {
