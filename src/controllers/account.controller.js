@@ -18,4 +18,5 @@ module.exports = {
     const { data, status } = await accountService.updateUser(req.params.id, req.body);
     return res.status(status).json(data);
   },
+ 
 };

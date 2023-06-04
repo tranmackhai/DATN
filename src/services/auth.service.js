@@ -113,9 +113,7 @@ module.exports = {
       const { data } = await accountService.getById(id);
       return {
         status: 200,
-        data: {
-          user: data,
-        },
+        data,
       };
     } catch (error) {
       return { status: 500, data: { message: "Oops!!! Smomething's wrongs." } };
@@ -123,7 +121,7 @@ module.exports = {
   },
   // thay đổi mật khẩu, bên client dùng setting api privateClient, truyền current password với newpassword
   changePassword: async (id, body) => {
-    const {currentpassword, newpassword} = body
+    const { password, newPassword } = body;
     try {
       const user = await db.Account.findOne({
         raw: true,
@@ -134,14 +132,12 @@ module.exports = {
       if (user) {
         const checkPassword = await argon.verify(
           user.password,
-          currentpassword
+          password
         );
+        // console.log(checkPassword)
         if (checkPassword) {
-          const hash = await argon.hash(newpassword);
-          await db.Account.update(
-            { hash },
-            { where: { id: parseInt(id) } }
-          );
+          const hash = await argon.hash(newPassword);
+          await db.Account.update({ password: hash }, { where: { id: parseInt(id) } });
           return {
             status: 200,
             data: {
@@ -150,6 +146,7 @@ module.exports = {
           };
         }
       }
+      // console.log(user)
     } catch (error) {
       console.log(error);
     }
@@ -160,14 +157,17 @@ module.exports = {
   },
 
   // thay đổi thông tin cá nhân,bên client dùng setting api privateClient
-  changeProfile : async (id, body) => {
+  changeProfile: async (id, body) => {
     // truyền name,sex,phone,address,birthday
     try {
-      await db.Account.update({...body}, {
-        where: {
-          id: parseInt(id)
+      await db.Account.update(
+        { ...body },
+        {
+          where: {
+            id: parseInt(id),
+          },
         }
-      })
+      );
       return {
         status: 200,
         data: {
@@ -181,5 +181,5 @@ module.exports = {
         data: { message: "Error" },
       };
     }
-  }
+  },
 };

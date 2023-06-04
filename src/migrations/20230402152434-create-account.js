@@ -24,9 +24,12 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: "",
       },
+      province: { type: Sequelize.STRING, defaultValue: "" },
+      district: { type: Sequelize.STRING, defaultValue: "" },
+      ward: { type: Sequelize.STRING, defaultValue: "" },
       birthday: {
         type: Sequelize.DATE,
-        defaultValue: new Date(),
+        defaultValue: new Date("2001/01/01"),
       },
       gmail: {
         type: Sequelize.STRING,

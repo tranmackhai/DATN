@@ -8,7 +8,7 @@ router.post("/login", authController.login);
 router.post("/logout", authController.logout);
 router.post("/refreshToken", authController.refreshToken);
 router.get("/getProfile", loginRequired, authController.getProfile);
-router.post("/changePassword", loginRequired, authController.changePassword);
-router.post("/changeProfile", loginRequired, authController.changeProfile);
+router.patch("/changePassword", loginRequired, authController.changePassword);
+router.patch("/changeProfile", loginRequired, authController.changeProfile);
 
 module.exports = router;

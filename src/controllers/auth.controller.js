@@ -47,6 +47,7 @@ class AuthController {
 
   async changeProfile(req, res) {
     const { data, status } = await authService.changeProfile(req.user.id, req.body);
+    // console.log(req.body)
     return res.status(status).json(data);
   }
 }
