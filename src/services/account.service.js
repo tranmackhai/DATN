@@ -1,9 +1,31 @@
 const db = require("../models");
+const argon = require("argon2");
+const { Op } = require("sequelize");
 
 module.exports = {
   create: () => {
-    return { data: "test", status: 202 };
+    return { data: "", status: 201 };
   },
+
+  createAdmin: async () => {
+    try {
+      const hash = await argon.hash("12345678");
+      const saved = await db.Account.create({
+        name: "Trần Mặc Khải",
+        gmail: "tranmackhai@gmail.com",
+        phone: "0337867708",
+        password: hash,
+        role: "admin",
+      });
+
+      const { password: _hash, ...others } = saved.dataValues;
+      return { status: 201, data: { user: others } };
+    } catch (error) {
+      console.log(error);
+      return { status: 500, data: { message: "Oops!!! Smomething's wrongs." } };
+    }
+  },
+
   getAll: async (query) => {
     try {
       const { limit, p, sortBy, sortType } = query;
@@ -12,6 +34,7 @@ module.exports = {
       const { rows, count } = await db.Account.findAndCountAll({
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
+        where: { role: { [Op.ne]: "admin" } },
         order: [[sortBy || "createdAt", sortType || "DESC"]],
       });
       return { status: 200, data: { rows, count } };

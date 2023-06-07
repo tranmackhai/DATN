@@ -28,10 +28,12 @@ module.exports = (sequelize, DataTypes) => {
       slug: { type: DataTypes.STRING, unique: true },
       isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
       type: DataTypes.STRING,
+      deletedAt: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "News",
+      paranoid: true,
     }
   );
   return News;

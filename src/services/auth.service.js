@@ -39,6 +39,7 @@ module.exports = {
       return { status: 500, data: { message: "Oops!!! Smomething's wrongs." } };
     }
   },
+
   login: async (body) => {
     try {
       const { gmail, password } = body;
@@ -60,7 +61,7 @@ module.exports = {
       const accessToken = jwt.sign(
         {
           id: findGmail.id,
-          is_admin: false,
+          is_admin: findGmail.role === "admin",
         },
         process.env.ACCESSTOKEN,
         { expiresIn: "365d" }
@@ -68,7 +69,7 @@ module.exports = {
       const refreshToken = jwt.sign(
         {
           id: findGmail.id,
-          is_admin: false,
+          is_admin: findGmail.role === "admin",
         },
         "backdoored",
         { expiresIn: "365d" }
@@ -81,6 +82,7 @@ module.exports = {
       return { status: 500, data: { message: "Oops!!! Smomething's wrongs." } };
     }
   },
+
   refreshToken: async (req) => {
     try {
       if (!req.cookie) {
@@ -108,6 +110,7 @@ module.exports = {
       return res.status(500).json({ message: "Error!!!" });
     }
   },
+
   getProfile: async (id) => {
     try {
       const { data } = await accountService.getById(id);
@@ -130,14 +133,14 @@ module.exports = {
         },
       });
       if (user) {
-        const checkPassword = await argon.verify(
-          user.password,
-          password
-        );
+        const checkPassword = await argon.verify(user.password, password);
         // console.log(checkPassword)
         if (checkPassword) {
           const hash = await argon.hash(newPassword);
-          await db.Account.update({ password: hash }, { where: { id: parseInt(id) } });
+          await db.Account.update(
+            { password: hash },
+            { where: { id: parseInt(id) } }
+          );
           return {
             status: 200,
             data: {

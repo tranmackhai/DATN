@@ -11,6 +11,7 @@ const loginRequired = (req, res, next) => {
   //   }
   // }
   // next();
+
   const reqHeader = req.headers["authorization"];
   if (reqHeader) {
     const accessToken = reqHeader.split(" ")[1];
@@ -32,8 +33,19 @@ const loginRequired = (req, res, next) => {
   });
 };
 
+const verifyAccountIdAndAdmin = (req, res, next) => {
+  loginRequired(req, res, () => {
+    if (+req.params.id === req.user.id || req.user.is_admin) {
+      return next();
+    } else {
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
+    }
+  });
+};
+
 const verifyAdmin = (req, res, next) => {
-  
   const reqHeader = req.headers["authorization"];
   if (reqHeader) {
     const accessToken = reqHeader.split(" ")[1];
@@ -44,7 +56,7 @@ const verifyAdmin = (req, res, next) => {
           process.env.ACCESSTOKEN || "super-serect"
         );
         req.user = user;
-        if(user.role === "admin"){
+        if (user.is_admin === "admin") {
           return next();
         }
       } catch (error) {
@@ -57,5 +69,4 @@ const verifyAdmin = (req, res, next) => {
   });
 };
 
-module.exports = { loginRequired
-  ,verifyAdmin };
+module.exports = { loginRequired, verifyAdmin, verifyAccountIdAndAdmin };
