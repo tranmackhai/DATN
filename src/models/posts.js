@@ -10,7 +10,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Posts.belongsTo(Posts, { as: "parent", foreignKey: "parentId" });
-      Posts.belongsTo(models.Topic, { as: "topic", foreignKey: "topicId" });
+      Posts.belongsTo(models.Category, {
+        as: "category",
+        foreignKey: "categoryId",
+      });
+      Posts.belongsTo(models.Account, {
+        as: "account",
+        foreignKey: "accountId",
+      });
       Posts.hasMany(Posts, { as: "children", foreignKey: "parentId" });
     }
   }
@@ -19,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       content: DataTypes.TEXT,
       accountId: DataTypes.INTEGER,
-      topicId: DataTypes.INTEGER,
+      categoryId: DataTypes.INTEGER,
       likes: { type: DataTypes.INTEGER, defaultValue: 0 },
       views: { type: DataTypes.INTEGER, defaultValue: 0 },
       parentId: {

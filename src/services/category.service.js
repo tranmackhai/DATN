@@ -1,13 +1,14 @@
 const db = require("../models");
-// const { Op } = require("sequelize");
+const { Op } = require("sequelize");
 
 module.exports = {
-  create: async (body, accountId) => {
+  create: async (body) => {
     console.log(body);
     try {
-      const data = await db.Posts.create({
+      const data = await db.Category.create({
         ...body,
-        accountId,
+        // type: "recruitment",
+        // accountId: 4,
       });
       return { data: data, status: 201 };
     } catch (error) {
@@ -15,54 +16,34 @@ module.exports = {
       return { data: { message: "Wrooong!!" }, status: 500 };
     }
   },
-  getAll: async (query, accountId) => {
+
+  getAll: async (query) => {
     // console.log(query);
     try {
-      const { limit, p, sortBy, sortType, slug, categorySlug } = query;
+      const { limit, p, sortBy, sortType, slug, parentId } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
-      const { rows, count } = await db.Posts.findAndCountAll({
+      const { rows, count } = await db.Category.findAndCountAll({
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
         where: {
           ...(slug ? { slug } : {}),
-          ...(categorySlug ? { "$category.slug$": categorySlug } : {}),
+          ...(parentId
+            ? {
+                parentId: { [Op.ne]: parentId === "null" ? null : parentId },
+              }
+            : {}),
         },
         include: [
           {
             model: db.Category,
-            as: "category",
+            as: "children",
           },
-          {
-            model: db.Account,
-            as: "account",
-          },
+          { model: db.Category, as: "parent" },
         ],
         order: [[sortBy || "createdAt", sortType || "DESC"]],
       });
       return { status: 200, data: { rows, count } };
-    } catch (error) {
-      console.log(error);
-      return { status: 500, data: { message: "Error data!!" } };
-    }
-  },
-  getById: async (id) => {
-    try {
-      const data = await db.Posts.findOne({
-        where: { id },
-        include: [
-          {
-            model: db.Category,
-            as: "category",
-          },
-          {
-            model: db.Account,
-            as: "account",
-          },
-        ],
-      });
-
-      return { status: 200, data };
     } catch (error) {
       console.log(error);
       return { status: 500, data: { message: "Error data!!" } };
@@ -112,10 +93,10 @@ module.exports = {
   search: async (query) => {
     // console.log(query);
     try {
-      const { limit, p, sortBy, sortType, q } = query;
+      const { limit, p, sortBy, sortType, isActive, q } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
-      const { rows, count } = await db.Posts.findAndCountAll({
+      const { rows, count } = await db.Category.findAndCountAll({
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
         where: {

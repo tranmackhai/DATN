@@ -28,7 +28,7 @@ module.exports = {
       accountId: {
         type: Sequelize.INTEGER,
       },
-      topicId: {
+      categoryId: {
         type: Sequelize.INTEGER,
       },
       likes: {
