@@ -7,8 +7,6 @@ module.exports = {
     try {
       const data = await db.Category.create({
         ...body,
-        // type: "recruitment",
-        // accountId: 4,
       });
       return { data: data, status: 201 };
     } catch (error) {
@@ -23,6 +21,7 @@ module.exports = {
       const { limit, p, sortBy, sortType, slug, parentId } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
+
       const { rows, count } = await db.Category.findAndCountAll({
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
@@ -38,6 +37,18 @@ module.exports = {
           {
             model: db.Category,
             as: "children",
+            include: [
+              {
+                model: db.Posts,
+                as: "postsList",
+                include: [
+                  {
+                    model: db.Account,
+                    as: "account",
+                  },
+                ],
+              },
+            ],
           },
           { model: db.Category, as: "parent" },
         ],

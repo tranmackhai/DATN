@@ -7,6 +7,7 @@ module.exports = {
   },
   getAll: async (req, res, next) => {
     const { data, status } = await postsService.getAll(req.query, req.user.id);
+    // console.log(req.query);
     return res.status(status).json(data);
   },
   getById: async (req, res, next) => {

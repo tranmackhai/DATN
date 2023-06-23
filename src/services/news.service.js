@@ -26,7 +26,8 @@ module.exports = {
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
         where: {
-          type: type || "recruitment",
+          // type: type || "recruitment",
+          ...(type ? { type } : {}),
           ...(slug ? { slug } : {}),
           ...(isActive ? { isActive } : {}),
         },

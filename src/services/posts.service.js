@@ -1,13 +1,31 @@
 const db = require("../models");
-// const { Op } = require("sequelize");
+const { Op } = require("sequelize");
 
 module.exports = {
   create: async (body, accountId) => {
     console.log(body);
     try {
-      const data = await db.Posts.create({
+      let data = await db.Posts.create({
         ...body,
         accountId,
+      });
+      data = await db.Posts.findOne({
+        where: { id: data.id },
+        include: [
+          {
+            model: db.Category,
+            as: "category",
+          },
+          {
+            model: db.Account,
+            as: "account",
+          },
+          {
+            model: db.Posts,
+            as: "parent",
+            include: [{ model: db.Account, as: "account" }],
+          },
+        ],
       });
       return { data: data, status: 201 };
     } catch (error) {
@@ -15,10 +33,21 @@ module.exports = {
       return { data: { message: "Wrooong!!" }, status: 500 };
     }
   },
+
   getAll: async (query, accountId) => {
     // console.log(query);
     try {
-      const { limit, p, sortBy, sortType, slug, categorySlug } = query;
+      const {
+        limit,
+        p,
+        sortBy,
+        sortType,
+        slug,
+        categorySlug,
+        onlyParent,
+        id,
+        title,
+      } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
       const { rows, count } = await db.Posts.findAndCountAll({
@@ -26,6 +55,9 @@ module.exports = {
         ...(offset > -1 ? { offset } : {}),
         where: {
           ...(slug ? { slug } : {}),
+          ...(id ? { id: { [Op.ne]: id } } : {}),
+          ...(title ? { title } : {}),
+          ...(onlyParent ? { parentId: null } : {}),
           ...(categorySlug ? { "$category.slug$": categorySlug } : {}),
         },
         include: [
@@ -37,6 +69,20 @@ module.exports = {
             model: db.Account,
             as: "account",
           },
+          {
+            model: db.Posts,
+            as: "parent",
+          },
+          {
+            model: db.Posts,
+            as: "children",
+            include: [
+              {
+                model: db.Account,
+                as: "account",
+              },
+            ],
+          },
         ],
         order: [[sortBy || "createdAt", sortType || "DESC"]],
       });
@@ -46,6 +92,7 @@ module.exports = {
       return { status: 500, data: { message: "Error data!!" } };
     }
   },
+
   getById: async (id) => {
     try {
       const data = await db.Posts.findOne({
@@ -58,6 +105,14 @@ module.exports = {
           {
             model: db.Account,
             as: "account",
+          },
+          {
+            model: db.Posts,
+            as: "children",
+            include: [
+              { model: db.Account, as: "account" },
+              { model: db.Posts, as: "parent" },
+            ],
           },
         ],
       });
