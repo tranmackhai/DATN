@@ -25,7 +25,7 @@ class AuthController {
 
   async loginAdmin(req, res) {
     const { status, data } = await authService.login(req.body);
-    if (data.user.role !== "admin")
+    if (data?.user?.role !== "admin")
       return res.status(401).json("Tài khoản này không có quyền truy cập");
     res.cookie("refreshToken", data.refreshToken, {
       httpOnly: true,

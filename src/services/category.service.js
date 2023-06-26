@@ -18,7 +18,7 @@ module.exports = {
   getAll: async (query) => {
     // console.log(query);
     try {
-      const { limit, p, sortBy, sortType, slug, parentId } = query;
+      const { limit, p, sortBy, sortType, slug, parentId, hidePosts } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
 
@@ -33,25 +33,29 @@ module.exports = {
               }
             : {}),
         },
-        include: [
-          {
-            model: db.Category,
-            as: "children",
-            include: [
-              {
-                model: db.Posts,
-                as: "postsList",
-                include: [
-                  {
-                    model: db.Account,
-                    as: "account",
-                  },
-                ],
-              },
-            ],
-          },
-          { model: db.Category, as: "parent" },
-        ],
+        ...(hidePosts
+          ? { include: [{ model: db.Category, as: "parent" }] }
+          : {
+              include: [
+                {
+                  model: db.Category,
+                  as: "children",
+                  include: [
+                    {
+                      model: db.Posts,
+                      as: "postsList",
+                      include: [
+                        {
+                          model: db.Account,
+                          as: "account",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                { model: db.Category, as: "parent" },
+              ],
+            }),
         order: [[sortBy || "createdAt", sortType || "DESC"]],
       });
       return { status: 200, data: { rows, count } };
@@ -104,7 +108,7 @@ module.exports = {
   search: async (query) => {
     // console.log(query);
     try {
-      const { limit, p, sortBy, sortType, isActive, q } = query;
+      const { limit, p, sortBy, sortType, q } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
       const { rows, count } = await db.Category.findAndCountAll({

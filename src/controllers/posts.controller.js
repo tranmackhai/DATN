@@ -14,4 +14,14 @@ module.exports = {
     const { data, status } = await postsService.getById(req.params.id);
     return res.status(status).json(data);
   },
+
+  update: async (req, res, next) => {
+    const { data, status } = await postsService.updateStatus(req.params.slug);
+    return res.status(status).json(data);
+  },
+
+  delete: async (req, res, next) => {
+    const { data, status } = await postsService.delete(+req.params.id);
+    return res.status(status).json(data);
+  },
 };

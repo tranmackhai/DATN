@@ -43,6 +43,7 @@ module.exports = {
       return { status: 500, data: { message: "Error data!!" } };
     }
   },
+
   getById: async (id) => {
     try {
       const data = await db.Account.findOne({ where: { id } });
@@ -52,6 +53,7 @@ module.exports = {
       return { status: 500, data: { message: "Error data!!" } };
     }
   },
+
   // sửa tài khoản bên admin
   updateUser: async (id, body) => {
     try {
@@ -66,6 +68,29 @@ module.exports = {
           message: "update success",
         },
       };
+    } catch (error) {
+      console.log(error);
+      return { status: 500, data: { message: "Error data!!" } };
+    }
+  },
+
+  search: async (query) => {
+    // console.log(query);
+    try {
+      const { limit, p, sortBy, sortType, q, role } = query;
+      const pageSize = limit ? +limit : -1;
+      const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
+      const { rows, count } = await db.Account.findAndCountAll({
+        ...(pageSize > -1 ? { limit: pageSize } : {}),
+        ...(offset > -1 ? { offset } : {}),
+        where: {
+          name: { [Op.iLike]: `%${q}%` },
+          ...(role ? { role } : {}),
+        },
+        order: [[sortBy || "createdAt", sortType || "DESC"]],
+      });
+      // console.log(q);
+      return { status: 200, data: { rows, count } };
     } catch (error) {
       console.log(error);
       return { status: 500, data: { message: "Error data!!" } };

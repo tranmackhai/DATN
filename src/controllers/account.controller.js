@@ -28,4 +28,9 @@ module.exports = {
     );
     return res.status(status).json(data);
   },
+
+  search: async (req, res, next) => {
+    const { data, status } = await accountService.search(req.query);
+    return res.status(status).json(data);
+  },
 };

@@ -50,7 +50,7 @@ module.exports = {
       } = query;
       const pageSize = limit ? +limit : -1;
       const offset = pageSize !== -1 ? (+p - 1) * pageSize : -1;
-      const { rows, count } = await db.Posts.findAndCountAll({
+      const data = await db.Posts.findAll({
         ...(pageSize > -1 ? { limit: pageSize } : {}),
         ...(offset > -1 ? { offset } : {}),
         where: {
@@ -59,6 +59,17 @@ module.exports = {
           ...(title ? { title } : {}),
           ...(onlyParent ? { parentId: null } : {}),
           ...(categorySlug ? { "$category.slug$": categorySlug } : {}),
+        },
+        include: [
+          {
+            model: db.Category,
+            as: "category",
+          },
+        ],
+      });
+      const { rows, count } = await db.Posts.findAndCountAll({
+        where: {
+          id: { [Op.in]: data.map((item) => item.dataValues.id) },
         },
         include: [
           {
@@ -86,6 +97,12 @@ module.exports = {
         ],
         order: [[sortBy || "createdAt", sortType || "DESC"]],
       });
+      for (let i = 0; i < rows.length; i++) {
+        const { count } = await db.Posts.findAndCountAll({
+          where: { title: rows[i].title },
+        });
+        rows[i].dataValues.countChildren = count - 1;
+      }
       return { status: 200, data: { rows, count } };
     } catch (error) {
       console.log(error);
@@ -126,7 +143,7 @@ module.exports = {
 
   update: async (id, body) => {
     try {
-      const data = await db.Category.update(body, { where: { id } });
+      const data = await db.Posts.update(body, { where: { id } });
       return { data: { message: "Successfully!" }, status: 200 };
     } catch (error) {
       console.log(error);
@@ -136,7 +153,7 @@ module.exports = {
 
   delete: async (id) => {
     try {
-      const data = await db.Category.destroy({ where: { id } });
+      const data = await db.Posts.destroy({ where: { id } });
       return { data: { message: "Successfully!" }, status: 200 };
     } catch (error) {
       console.log(error);
